@@ -1,3 +1,5 @@
+import PositionedCharacter from './PositionedCharacter';
+
 /**
  * @todo
  * @param index - индекс поля
@@ -23,7 +25,23 @@
  * ```
  * */
 export function calcTileType(index, boardSize) {
-  // TODO: ваш код будет тут
+  if (index === 0) {
+    return 'top-left';
+  } if (index === boardSize - 1) {
+    return 'top-right';
+  } if (index === boardSize * boardSize - boardSize) {
+    return 'bottom-left';
+  } if (index === boardSize * boardSize - 1) {
+    return 'bottom-right';
+  } if (index < boardSize - 1) {
+    return 'top';
+  } if (index > boardSize * boardSize - boardSize) {
+    return 'bottom';
+  } if (index % boardSize === 0) {
+    return 'left';
+  } if ((index + 1) % boardSize === 0) {
+    return 'right';
+  }
   return 'center';
 }
 
@@ -37,4 +55,24 @@ export function calcHealthLevel(health) {
   }
 
   return 'high';
+}
+
+export function getPositions(available, count) {
+  const positions = [];
+  while (positions.length < count) {
+    const item = available[Math.floor(Math.random() * available.length)];
+    if (!positions.includes(item)) {
+      positions.push(item);
+    }
+  }
+  return positions;
+}
+
+export function getPositionedCharacterArray(team, positions) {
+  const positionedCharacterArray = [];
+  for (let i = 0; i < team.length; i += 1) {
+    const item = new PositionedCharacter(team[i], positions[i]);
+    positionedCharacterArray.push(item);
+  }
+  return positionedCharacterArray;
 }

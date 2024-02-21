@@ -12,5 +12,11 @@
  * ```
  * */
 export default class Team {
-  // TODO: write your logic here
+  constructor(characters) {
+    this.characters = [];
+    characters.forEach((element) => {
+      const ch = element;
+      this.characters.push(ch);
+    });
+  }
 }

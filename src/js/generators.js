@@ -1,4 +1,5 @@
-import Team from './Team';
+import PlayerTeam from "./PlayerTeam";
+import ComputerTeam from "./ComputerTeam";
 
 /**
  * Формирует экземпляр персонажа из массива allowedTypes со
@@ -26,16 +27,21 @@ export function* characterGenerator(allowedTypes, maxLevel) {
  * @returns экземпляр Team, хранящий экземпляры персонажей. Количество персонажей в команде -
  * characterCount
  * */
-export function* generateTeam(allowedTypes, maxLevel, characterCount) {
+export function generateTeam(allowedTypes, maxLevel, characterCount, owner) {
   const types = allowedTypes;
   const level = maxLevel;
   const count = characterCount;
 
-  while (true) {
     const characters = [];
     for (let i = 0; i < count; i += 1) {
       characters.push(new types[Math.floor(Math.random() * (types.length))](Math.ceil(Math.random() * level)));
     }
-    yield new Team(characters);
-  }
+    switch (owner) {
+      case 'player':
+        return new PlayerTeam(characters);
+      case 'computer':
+        return new ComputerTeam(characters);
+      default:
+        throw new Error()
+    }    
 }

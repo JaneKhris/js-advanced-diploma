@@ -1,4 +1,5 @@
-/**
+ import PositionedCharacter from "./PositionedCharacter";
+ /**
  * Класс, представляющий персонажей команды
  *
  * @todo Самостоятельно продумайте хранение персонажей в классе
@@ -18,5 +19,32 @@ export default class Team {
       const ch = element;
       this.characters.push(ch);
     });
+
+    if (new.target === Team) {
+      throw new Error('Невозможно создать команду Team');
+    }
   }
+
+  getPositions(boardSize, count) {
+    const available = this.getAvailable(boardSize);
+    const positions = [];
+    while (positions.length < count) {
+      const item = available[Math.floor(Math.random() * available.length)];
+      if (!positions.includes(item)) {
+        positions.push(item);
+      }
+    }
+    return positions;
+  }
+
+  getPositionedCharacters(boardSize, count) {
+      const positions = this.getPositions(boardSize, count);
+      const positionedCharacterArray = [];
+      for (let i = 0; i < this.characters.length; i += 1) {
+        const item = new PositionedCharacter(this.characters[i], positions[i]);
+        positionedCharacterArray.push(item);
+      }
+      return positionedCharacterArray;
+    }
+  
 }

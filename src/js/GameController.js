@@ -9,15 +9,17 @@ export default class GameController {
 
   init() {
     this.gamePlay.drawUi('prairie');
-    this.teamPlayer = generateTeam(this.gamePlay.playerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam).next().value;
-    this.teamRival = generateTeam(this.gamePlay.rivalTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam).next().value;
-    this.teamPlayerPositions = getPositions(this.gamePlay.getPositionsAvailable().player, this.gamePlay.charInTeam);
-    this.teamRivalPositions = getPositions(this.gamePlay.getPositionsAvailable().rival, this.gamePlay.charInTeam);
-    this.teamPlayerArray = getPositionedCharacterArray(this.teamPlayer.characters, this.teamPlayerPositions);
-    this.teamRivalArray = getPositionedCharacterArray(this.teamRival.characters, this.teamRivalPositions);
-    this.positionedCharacterArray = this.teamPlayerArray.concat(this.teamRivalArray);
-    this.gamePlay.redrawPositions(this.positionedCharacterArray);
 
+    this.playerTeam = generateTeam(this.gamePlay.playerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam, 'player');
+    this.computerTeam = generateTeam(this.gamePlay.computerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam, 'computer');
+
+    this.playerArray = this.playerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam);
+    this.computerArray = this.computerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam);
+    this.positionedCharacters = this.playerArray.concat(this.computerArray)
+
+    this.gamePlay.redrawPositions(this.positionedCharacters);
+    
+    this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
     // TODO: add event listeners to gamePlay events
     // TODO: load saved stated from stateService
   }
@@ -27,7 +29,12 @@ export default class GameController {
   }
 
   onCellEnter(index) {
-    // TODO: react to mouse enter
+    const character = this.positionedCharacters.find(positionedCharacter => positionedCharacter.position == index);
+    
+    if (character) {
+      const char = character.character;
+      this.gamePlay.showCellTooltip(`\u{1F396}${char.level} \u{2694}${char.attack} \u{1F6E1}${char.defence} \u{2764}${char.health} `,index)
+    }
   }
 
   onCellLeave(index) {

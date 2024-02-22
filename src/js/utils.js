@@ -57,22 +57,6 @@ export function calcHealthLevel(health) {
   return 'high';
 }
 
-export function getPositions(available, count) {
-  const positions = [];
-  while (positions.length < count) {
-    const item = available[Math.floor(Math.random() * available.length)];
-    if (!positions.includes(item)) {
-      positions.push(item);
-    }
-  }
-  return positions;
-}
 
-export function getPositionedCharacterArray(team, positions) {
-  const positionedCharacterArray = [];
-  for (let i = 0; i < team.length; i += 1) {
-    const item = new PositionedCharacter(team[i], positions[i]);
-    positionedCharacterArray.push(item);
-  }
-  return positionedCharacterArray;
-}
+
+

@@ -12,7 +12,7 @@ export default class GamePlay {
     this.charInTeam = 3;
     this.maxLevel = 3;
     this.playerTypes = [Bowman, Swordsman, Magician];
-    this.rivalTypes = [Daemon, Undead, Vampire];
+    this.computerTypes = [Daemon, Undead, Vampire];
     this.container = null;
     this.boardEl = null;
     this.cells = [];
@@ -239,27 +239,4 @@ export default class GamePlay {
     }
   }
 
-  getPositionsAvailable() {
-    const playerPositions = [];
-    const rivalPositions = [];
-    const n = this.boardSize;
-    for (let i = 0; i < n * n; i += 1) {
-      switch (i % n) {
-        case 0:
-        case 1:
-          playerPositions.push(i);
-          break;
-        case (n - 1):
-        case (n - 2):
-          rivalPositions.push(i);
-          break;
-        default:
-          break;
-      }
-    }
-    return {
-      player: playerPositions,
-      rival: rivalPositions,
-    };
-  }
 }

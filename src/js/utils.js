@@ -1,5 +1,3 @@
-import PositionedCharacter from './PositionedCharacter';
-
 /**
  * @todo
  * @param index - индекс поля
@@ -57,6 +55,30 @@ export function calcHealthLevel(health) {
   return 'high';
 }
 
+export function getArea(index, radius, boardSize) {
+  const areaArray = [];
+  const indexCoordinates = getCoordinates(index,boardSize);
 
+  for (let i=0; i < boardSize*boardSize; i++) {
+    
+    const iRow = getCoordinates(i,boardSize).row;
+    const iColumn = getCoordinates(i,boardSize).column;
+    
+    if ((iRow >= indexCoordinates.row-radius && iRow <= indexCoordinates.row+radius) &&
+      (iColumn >= indexCoordinates.column-radius && iColumn <= indexCoordinates.column+radius)) {
+      areaArray.push(i);
+      }
+  }
+  return areaArray;  
+}
+
+function getCoordinates(index,boardSize) {
+  const row = Math.ceil((index+1)/boardSize);
+  const column = index % boardSize+1;
+  return {
+    row,
+    column
+  }
+}
 
 

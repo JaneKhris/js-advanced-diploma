@@ -1,4 +1,5 @@
  import PositionedCharacter from "./PositionedCharacter";
+import { getArea } from "./utils";
  /**
  * Класс, представляющий персонажей команды
  *

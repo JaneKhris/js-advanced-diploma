@@ -1,3 +1,5 @@
+import { getArea } from "./utils";
+
 /**
  * Базовый класс, от которого наследуются классы персонажей
  * @property level - уровень персонажа, от 1 до 4
@@ -24,4 +26,13 @@ export default class Character {
       throw new Error('Невозможно создать персонаж Character');
     }
   }
+
+  getAttackArea(index, boardSize) {
+    return getArea(index, this.attackArea, boardSize)
+  }
+
+  getMoveArea(index, boardSize) {
+    return getArea(index, this.moveArea, boardSize)
+  }
+
 }

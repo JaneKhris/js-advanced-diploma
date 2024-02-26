@@ -7,6 +7,6 @@ export default class Bowman extends Character {
     this.defence = 25;
     this.type = 'bowman';
     this.moveArea = 2;
-    this.attackArea = 2;
+    this.attackArea = 7;
   }
 }

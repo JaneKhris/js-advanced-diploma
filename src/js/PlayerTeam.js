@@ -5,6 +5,11 @@
         super(characters)
     }
 
+/**
+ * Формирует область для расположения персонажей
+ * @param boardSize размер поля
+ * @returns массив, содержащий индексы полей, в которыых могут быть расположены персонажи команды
+ * */
     getAvailable(boardSize) {
         const positions = [];
         const n = boardSize;

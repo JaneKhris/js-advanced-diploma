@@ -1,18 +1,8 @@
  import PositionedCharacter from "./PositionedCharacter";
-import { getArea } from "./utils";
  /**
- * Класс, представляющий персонажей команды
- *
- * @todo Самостоятельно продумайте хранение персонажей в классе
- * Например
- * @example
- * ```js
- * const characters = [new Swordsman(2), new Bowman(1)]
- * const team = new Team(characters);
- *
- * team.characters // [swordsman, bowman]
- * ```
- * */
+ * Базовый класс, от которого наследуются команды
+ * @property characters - массив персонажей в классе
+ */
 export default class Team {
   constructor(characters) {
     this.characters = [];
@@ -26,6 +16,13 @@ export default class Team {
     }
   }
 
+  /**
+ * Формирует индексы полей для расположения персонажей
+ * @param boardSize размер поля
+ * @param count количесвто персонажей в команде
+ * @returns массив, содержащий индексы полей, в которыых будут расположены персонажи команды
+ * */
+
   getPositions(boardSize, count) {
     const available = this.getAvailable(boardSize);
     const positions = [];
@@ -37,6 +34,13 @@ export default class Team {
     }
     return positions;
   }
+
+/**
+ * Формирует массив персонажей, расположенных на игровои поле
+ * @param boardSize размер поля
+ * @param count количесвто персонажей в команде
+ * @returns массив, содержащий экземпляры класса PositionedCharacter
+ * */
 
   getPositionedCharacters(boardSize, count) {
       const positions = this.getPositions(boardSize, count);

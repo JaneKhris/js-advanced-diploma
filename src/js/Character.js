@@ -27,10 +27,22 @@ export default class Character {
     }
   }
 
+/**
+ * Формирует область, доступную для перемещения персонажа
+ * @param index индекс поля
+ * @param boardSize размер поля
+ * @returns массив, содержащий индексы полей, доступных для перемещения персонажа
+ * */
   getAttackArea(index, boardSize) {
     return getArea(index, this.attackArea, boardSize)
   }
-
+  
+/**
+ * Формирует область, в которой персонаж может атаковать противника
+ * @param index индекс поля
+ * @param boardSize размер поля
+ * @returns массив, содержащий индексы полей, в которыых персонаж может атаковать противника
+ * */
   getMoveArea(index, boardSize) {
     return getArea(index, this.moveArea, boardSize)
   }

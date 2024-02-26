@@ -55,6 +55,14 @@ export function calcHealthLevel(health) {
   return 'high';
 }
 
+/**
+ * Формирует область отпределенного радиуса вокруг поля
+ * @param index индекс поля
+ * @param boardSize размер поля
+ * @param radius размер области
+ * @returns массив, содержащий индексы полей, входящих область заданного радиуса
+ * */
+
 export function getArea(index, radius, boardSize) {
   const areaArray = [];
   const indexCoordinates = getCoordinates(index,boardSize);
@@ -72,6 +80,15 @@ export function getArea(index, radius, boardSize) {
   return areaArray;  
 }
 
+/**
+ * Формирует координаты поля по вертикали и горизонтали
+ * @param index индекс поля
+ * @param boardSize размер поля
+ * @returns объект со свойствами:
+ * row - координата по вертикали
+ * column - координата по горизонтали
+ * 
+ * */
 function getCoordinates(index,boardSize) {
   const row = Math.ceil((index+1)/boardSize);
   const column = index % boardSize+1;

@@ -12,6 +12,10 @@ export default class GameController {
   init() {
     this.gamePlay.drawUi('prairie');
 
+    this.gameState = new GameState();
+    this.activeCharacter = {};
+
+
     // Формирование команд
     this.playerTeam = generateTeam(this.gamePlay.playerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam, 'player');
     this.computerTeam = generateTeam(this.gamePlay.computerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam, 'computer');
@@ -25,7 +29,6 @@ export default class GameController {
     this.gamePlay.redrawPositions(this.positionedCharacters);
 
 
-    this.gameState = new GameState();
     
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
 
@@ -38,6 +41,27 @@ export default class GameController {
   }
 
   onCellClick(index) {
+    if (this.activeCharacter.position) {
+      if (this.stateAvailableMove(index)) {
+        if (this.gameState.next.player) {
+          const damage = this.moveCharacter(this.playerArray, index);
+          const promise1 = this.gamePlay.showDamage(index, damage);
+          promise1.then('1');
+        } else {
+          const damage = this.moveCharacter(this.computerArray, index);
+        }
+        return null
+      }
+      if (this.stateAvailableAttack(index)) {
+        if ((this.gameState.next.player)) {
+          this.attackCharacter(this.computerArray,index);
+        } else {
+          this.attackCharacter(this.playerArray,index);
+        }
+        return null;
+      }
+
+    }
     if (this.gameState.next.player === true) {
       this.selectCharacter(this.playerArray, index);
     } else {
@@ -62,7 +86,7 @@ export default class GameController {
   onCellEnter(index) {
     this.gamePlay.setCursor(cursors.auto);
 
-    if (this.activeCharacter) {
+    if (this.activeCharacter.position) {
       if (this.stateSameCharacter(index)) {}
       if (this.stateSameTeamCharacter(index)) {
         this.gamePlay.setCursor(cursors.pointer)
@@ -88,7 +112,7 @@ export default class GameController {
 
 
   onCellLeave(index) {
-    if (this.activeCharacter) {
+    if (this.activeCharacter.position) {
       if ((this.stateAvailableAttack(index) || this.stateAvailableMove(index)) && this.activeCharacter.position != index) {
         this.gamePlay.deselectCell(index)
       }
@@ -127,6 +151,33 @@ export default class GameController {
     !(this.positionedCharacters.find(positionedCharacter => positionedCharacter.position == index)))
   }
 
+  moveCharacter(teamArray, index) {
+    this.gamePlay.deselectCell(this.activeCharacter.position);
+    teamArray.forEach((charPos) => {
+      if (charPos.position == this.activeCharacter.position) {
+        charPos.position = index;
+      }
+    })
+    this.changePlayer(index);
 
+  }
 
+  attackCharacter(teamArray, index) {
+    this.gamePlay.deselectCell(this.activeCharacter.position);
+    const attacker = this.activeCharacter.character;
+    const target = teamArray.find(positionedCharacter => positionedCharacter.position == index).character;
+    const damage = Math.max(attacker.attack - target.defence, attacker.attack * 0.1);
+    target.health -= damage;
+    this.changePlayer(index);
+    return damage
+
+  }
+
+  changePlayer(index) {
+    this.gamePlay.deselectCell(index);
+    this.activeCharacter = {};
+    this.gamePlay.redrawPositions(this.positionedCharacters);
+    this.gameState.change();
+
+  }
 }

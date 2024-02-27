@@ -3,7 +3,11 @@ export default class GameState {
     this.next = {
       player: true,
       computer: false
-    }
+    };
+    // this.playerTeam = [];
+    // this.computerTeam = [];
+    // this.activeCharacter = {};
+    
   }
 
   change() {

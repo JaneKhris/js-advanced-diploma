@@ -41,35 +41,27 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    if (this.activeCharacter.position) {
-      if (this.stateAvailableMove(this.activeCharacter, index)) {
-        if (this.gameState.next.player) {
-          this.moveCharacter(this.playerArray,index);
-          this.computerMove();
-        } 
-        // else {
-        //   this.moveCharacter(this.computerArray,index);
-        // }
-        return null
-      }
-      if (this.stateAvailableAttack(this.activeCharacter, index)) {
-        if ((this.gameState.next.player)) {
-          this.attackCharacter(this.computerArray,index);
-          this.computerMove();
-        } 
-        // else {
-        //   this.attackCharacter(this.playerArray,index);
-        // }
-        return null;
-      }
 
-    }
-    if (this.gameState.next.player === true) {
+    if (this.gameState.next.player) {
+      if (this.activeCharacter.position) {
+        if (this.stateAvailableMove(this.activeCharacter, index)) {
+          this.moveCharacter(this.activeCharacter, this.playerArray,index);
+          this.computerMove();
+
+          return null
+        }
+        if (this.stateAvailableAttack(this.activeCharacter, index)) {
+          this.attackCharacter(this.computerArray,index);
+          setTimeout(() => {
+            this.computerMove();
+          },3000)
+          return null;
+
+        }
+      }
       this.selectCharacter(this.playerArray, index);
     } 
-    // else {
-    //   this.selectCharacter(this.computerArray, index)
-    // }
+    
   }
 
   selectCharacter(teamArray, index) {
@@ -138,28 +130,28 @@ export default class GameController {
   }
   
 
-  stateOppositeTeamCharacter(index) {
+  stateOppositeTeamCharacter(character,index) {
     return (this.playerArray.find(positionedCharacter => positionedCharacter.position == index) &&
-    this.computerArray.find(positionedCharacter => positionedCharacter.position == this.activeCharacter.position)) || 
+    this.computerArray.find(positionedCharacter => positionedCharacter.position == character.position)) || 
     (this.computerArray.find(positionedCharacter => positionedCharacter.position == index) &&
-    this.playerArray.find(positionedCharacter => positionedCharacter.position == this.activeCharacter.position))
+    this.playerArray.find(positionedCharacter => positionedCharacter.position == character.position))
   }
   
 
   stateAvailableAttack(character, index) {
-    return this.stateOppositeTeamCharacter(index) &&
+    return this.stateOppositeTeamCharacter(character,index) &&
     character.character.getAttackArea(character.position, this.gamePlay.boardSize).includes(index)
   }
-r
+
   stateAvailableMove(character, index) {
     return (character.character.getMoveArea(character.position, this.gamePlay.boardSize).includes(index) &&
     !(this.positionedCharacters.find(positionedCharacter => positionedCharacter.position == index)))
   }
 
-  moveCharacter(teamArray, index) {
-    this.gamePlay.deselectCell(this.activeCharacter.position);
+  moveCharacter(character, teamArray, index) {
+    this.gamePlay.deselectCell(character.position);
     teamArray.forEach((charPos) => {
-      if (charPos.position == this.activeCharacter.position) {
+      if (charPos.position == character.position) {
         charPos.position = index;
       }
     })
@@ -167,16 +159,45 @@ r
   }
 
   attackCharacter(teamArray, index) {
+    const arrayOutput = []
     this.gamePlay.deselectCell(this.activeCharacter.position);
     const attacker = this.activeCharacter.character;
     const target = teamArray.find(positionedCharacter => positionedCharacter.position == index).character;
     const damage = Math.max(attacker.attack - target.defence, attacker.attack * 0.1);
     const promise1 = this.gamePlay.showDamage(index,damage);
+    console.log('attack!')
     promise1.then(() => {
       target.health -= damage;
+      if (target.health <= 0) {
+        this.playerArray = this.playerArray.filter((item => item.position != index))
+        this.computerArray = this.computerArray.filter((item => item.position != index))
+        this.positionedCharacters = this.playerArray.concat(this.computerArray)
+      }
       this.changePlayer(index);
     });
   }
+
+  // attackCharacter(teamArray, index) {
+  //   return new Promise((resolve) => {
+  //     const arrayOutput = []
+  //     this.gamePlay.deselectCell(this.activeCharacter.position);
+  //     const attacker = this.activeCharacter.character;
+  //     const target = teamArray.find(positionedCharacter => positionedCharacter.position == index).character;
+  //     const damage = Math.max(attacker.attack - target.defence, attacker.attack * 0.1);
+  //     const promise1 = this.gamePlay.showDamage(index,damage);
+  //     console.log('attack!')
+  //     promise1.then(() => {
+  //       target.health -= damage;
+  //       if (target.health <= 0) {
+  //         this.playerArray = this.playerArray.filter((item => item.position != index))
+  //         this.computerArray = this.computerArray.filter((item => item.position != index))
+  //         this.positionedCharacters = this.playerArray.concat(this.computerArray)
+  //       }
+  //       this.changePlayer(index);
+  //     });
+  //     resolve();
+  //   })
+  // }
 
   changePlayer(index) {
     this.gamePlay.deselectCell(index);
@@ -186,25 +207,30 @@ r
   }
 
   computerMove() {
+    const array = [];
     this.computerArray.forEach((computerCharacter) => {
       this.playerArray.forEach((playerCharacter) => {
-        if (this.stateAvailableAttack(computerCharacter,playerCharacter.position)) {
-          this.activeCharacter = computerCharacter;
-          this.attackCharacter(this.playerArray, playerCharacter.position)
-          return null
-        } 
+        array.push([computerCharacter, playerCharacter])
       })
     })
-    this.computerArray.forEach((computerCharacter) => {
-      if (this.stateAvailableMove(computerCharacter, computerCharacter.position-1)) {
-        this.moveCharacter(this.computerArray,computerCharacter.position-1)
+
+    for (const pair of array) { 
+      const computer = pair[0];
+      const player = pair[1];
+      if (computer.character.getAttackArea(computer.position, this.gamePlay.boardSize).includes(player.position)) {
+        this.activeCharacter = computer;
+        this.attackCharacter(this.playerArray, player.position);
         return null
       }
-    })
+    }
 
-
+    for (const computerCharacter of this.computerArray) {    
+      if (this.stateAvailableMove(computerCharacter, computerCharacter.position-1)) {
+        this.moveCharacter(computerCharacter,this.computerArray,computerCharacter.position-1)
+        return null
+      }
+    }
   }
-      
 }
 
 

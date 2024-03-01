@@ -28,7 +28,6 @@ export default class GameController {
     // Отрисовка поля
     this.gamePlay.redrawPositions(this.positionedCharacters);
 
-
     
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
 
@@ -36,47 +35,26 @@ export default class GameController {
 
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
 
-    // TODO: add event listeners to gamePlay events
-    // TODO: load saved stated from stateService
   }
 
   onCellClick(index) {
-
     if (this.gameState.next.player) {
       if (this.activeCharacter.position) {
         if (this.stateAvailableMove(this.activeCharacter, index)) {
           this.moveCharacter(this.activeCharacter, this.playerArray,index);
           this.computerMove();
-
           return null
         }
         if (this.stateAvailableAttack(this.activeCharacter, index)) {
           this.attackCharacter(this.computerArray,index);
-          setTimeout(() => {
-            this.computerMove();
-          },3000)
           return null;
 
         }
       }
       this.selectCharacter(this.playerArray, index);
     } 
-    
   }
 
-  selectCharacter(teamArray, index) {
-    if (teamArray.find(positionedCharacter => positionedCharacter.position == index)) {
-    teamArray.forEach((char) => {
-      if (char.position != index) {
-        this.gamePlay.deselectCell(char.position);
-      }
-    this.gamePlay.selectCell(index);
-    this.activeCharacter = teamArray.find(positionedCharacter => positionedCharacter.position == index);
-    })
-    } else {
-      GamePlay.showError('Невозможно выбрать эту ячейку');
-    }
-  }
 
   onCellEnter(index) {
     this.gamePlay.setCursor(cursors.auto);
@@ -114,14 +92,37 @@ export default class GameController {
         this.gamePlay.deselectCell(index)
       }
     }
-
-    // TODO: react to mouse leave
   }
 
+
+  selectCharacter(teamArray, index) {
+    if (teamArray.find(positionedCharacter => positionedCharacter.position == index)) {
+    teamArray.forEach((char) => {
+      if (char.position != index) {
+        this.gamePlay.deselectCell(char.position);
+      }
+    this.gamePlay.selectCell(index);
+    this.activeCharacter = teamArray.find(positionedCharacter => positionedCharacter.position == index);
+    })
+    } else {
+      GamePlay.showError('Невозможно выбрать эту ячейку');
+    }
+  }
+
+/**
+ * проверяет, что в ячейке выбранный персонаж
+ * @param index 
+ * @returns true в случае, если в ячейке выбранный персонаж
+ */
   stateSameCharacter(index) {
     return this.activeCharacter.position == index;
   }
 
+/**
+ * проверяет, что в ячейке персонаж, принадлежащий команде выбранного персонажа
+ * @param index 
+ * @returns 
+ */
   stateSameTeamCharacter(index) {
     return (this.playerArray.find(positionedCharacter => positionedCharacter.position == index) &&
     this.playerArray.find(positionedCharacter => positionedCharacter.position == this.activeCharacter.position)) || 
@@ -129,7 +130,12 @@ export default class GameController {
     this.computerArray.find(positionedCharacter => positionedCharacter.position == this.activeCharacter.position))
   }
   
-
+/**
+ * проверяет, что в ячейке персонаж из команды противника
+ * @param character выбранный персонаж
+ * @param index индекс ячейки поля
+ * @returns 
+ */
   stateOppositeTeamCharacter(character,index) {
     return (this.playerArray.find(positionedCharacter => positionedCharacter.position == index) &&
     this.computerArray.find(positionedCharacter => positionedCharacter.position == character.position)) || 
@@ -137,17 +143,34 @@ export default class GameController {
     this.playerArray.find(positionedCharacter => positionedCharacter.position == character.position))
   }
   
-
+/**
+ * проверяет, принадлежит ли ячейка области, доступной для атаки выбранным персонажем
+ * @param character выбранный персонаж
+ * @param index индекс ячейки пол
+ * @returns 
+ */
   stateAvailableAttack(character, index) {
     return this.stateOppositeTeamCharacter(character,index) &&
     character.character.getAttackArea(character.position, this.gamePlay.boardSize).includes(index)
   }
 
+/**
+ * проверяет, принадлежит ли ячейка области, доступной для перемещения выбранного персонажа
+ * @param character выбранный персонаж
+ * @param index индекс ячейки пол
+ * @returns 
+ */
   stateAvailableMove(character, index) {
     return (character.character.getMoveArea(character.position, this.gamePlay.boardSize).includes(index) &&
     !(this.positionedCharacters.find(positionedCharacter => positionedCharacter.position == index)))
   }
 
+/**
+ * перемещение персонажа
+ * @param character выбранный персонаж
+ * @param teamArray массив экземпляров класса PositionedCharacter команды выбранного персонажа
+ * @param index индекс ячейки поля
+ */
   moveCharacter(character, teamArray, index) {
     this.gamePlay.deselectCell(character.position);
     teamArray.forEach((charPos) => {
@@ -158,6 +181,11 @@ export default class GameController {
     this.changePlayer(index);
   }
 
+/**
+ * атака 
+ * @param teamArray массив экземпляров класса PositionedCharacter команды соперника
+ * @param index индекс ячейки поля
+ */
   attackCharacter(teamArray, index) {
     const arrayOutput = []
     this.gamePlay.deselectCell(this.activeCharacter.position);
@@ -174,38 +202,27 @@ export default class GameController {
         this.positionedCharacters = this.playerArray.concat(this.computerArray)
       }
       this.changePlayer(index);
+      if (this.gameState.next.computer) {
+        this.computerMove();
+      }
     });
   }
 
-  // attackCharacter(teamArray, index) {
-  //   return new Promise((resolve) => {
-  //     const arrayOutput = []
-  //     this.gamePlay.deselectCell(this.activeCharacter.position);
-  //     const attacker = this.activeCharacter.character;
-  //     const target = teamArray.find(positionedCharacter => positionedCharacter.position == index).character;
-  //     const damage = Math.max(attacker.attack - target.defence, attacker.attack * 0.1);
-  //     const promise1 = this.gamePlay.showDamage(index,damage);
-  //     console.log('attack!')
-  //     promise1.then(() => {
-  //       target.health -= damage;
-  //       if (target.health <= 0) {
-  //         this.playerArray = this.playerArray.filter((item => item.position != index))
-  //         this.computerArray = this.computerArray.filter((item => item.position != index))
-  //         this.positionedCharacters = this.playerArray.concat(this.computerArray)
-  //       }
-  //       this.changePlayer(index);
-  //     });
-  //     resolve();
-  //   })
-  // }
-
+/**
+ * переход хода и снятие выделения с ячеек поля
+ * @param index 
+ */
   changePlayer(index) {
     this.gamePlay.deselectCell(index);
     this.activeCharacter = {};
     this.gamePlay.redrawPositions(this.positionedCharacters);
     this.gameState.change();
   }
-
+  
+/**
+ * ход соперника
+ * @returns 
+ */
   computerMove() {
     const array = [];
     this.computerArray.forEach((computerCharacter) => {

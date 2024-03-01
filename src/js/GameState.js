@@ -4,10 +4,6 @@ export default class GameState {
       player: true,
       computer: false
     };
-    // this.playerTeam = [];
-    // this.computerTeam = [];
-    // this.activeCharacter = {};
-    
   }
 
   change() {

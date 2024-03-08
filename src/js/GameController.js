@@ -10,10 +10,12 @@ export default class GameController {
   }
 
   init() {
-    this.gamePlay.drawUi('prairie');
 
     this.gameState = new GameState();
     this.activeCharacter = {};
+
+    this.gamePlay.drawUi(this.gameState.getLevel());
+
 
 
     // Формирование команд
@@ -193,13 +195,17 @@ export default class GameController {
     const target = teamArray.find(positionedCharacter => positionedCharacter.position == index).character;
     const damage = Math.max(attacker.attack - target.defence, attacker.attack * 0.1);
     const promise1 = this.gamePlay.showDamage(index,damage);
-    console.log('attack!')
     promise1.then(() => {
       target.health -= damage;
       if (target.health <= 0) {
         this.playerArray = this.playerArray.filter((item => item.position != index))
         this.computerArray = this.computerArray.filter((item => item.position != index))
         this.positionedCharacters = this.playerArray.concat(this.computerArray)
+      }
+      if (this.playerArray.length == 0 || this.computerArray.length == 0) {
+        this.levelUpPlay();
+        this.activeCharacter.character.levelUp(this.gamePlay.maxLevel);
+        // this.levelUpCharacter(this.activeCharacter.character);
       }
       this.changePlayer(index);
       if (this.gameState.next.computer) {
@@ -247,7 +253,43 @@ export default class GameController {
         return null
       }
     }
+    
+    for (const computerCharacter of this.computerArray) {    
+      if (this.stateAvailableMove(computerCharacter, computerCharacter.position+1)) {
+        this.moveCharacter(computerCharacter,this.computerArray,computerCharacter.position+1)
+        return null
+      }
+    }
   }
+
+  /**
+   * повышение уровня персонажа
+   * @param  character 
+   */
+  // levelUpCharacter(character) {
+  //   if (character.level < this.gamePlay.maxLevel) {
+
+  //     character.level = character.level += 1;
+  //   }
+  //   const attackBefore = character.attack;
+  //   const life = character.health;
+  //   const attackAfter = Math.max(attackBefore, attackBefore * (80 + life) / 100);
+  //   character.attack = attackAfter;
+  //   if (character.health + 80 >= 100) {
+  //     character.health = 100
+  //   } else {
+  //     character.health += 80;
+  //   }
+  // }
+
+  /**
+   * 
+   */
+  levelUpPlay() {
+    this.gameState.level += 1;
+    this.gamePlay.drawUi(this.gameState.getLevel());
+  }
+
 }
 
 

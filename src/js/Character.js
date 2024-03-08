@@ -47,4 +47,18 @@ export default class Character {
     return getArea(index, this.moveArea, boardSize)
   }
 
+  levelUp(maxLevel) {
+    if (this.level < maxLevel) {
+      this.level = this.level += 1;
+    }
+    const attackBefore = this.attack;
+    const life = this.health;
+    const attackAfter = Math.max(attackBefore, attackBefore * (80 + life) / 100);
+    this.attack = attackAfter;
+    if (this.health + 80 >= 100) {
+      this.health = 100
+    } else {
+      this.health += 80;
+    }
+  }
 }

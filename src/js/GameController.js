@@ -19,8 +19,8 @@ export default class GameController {
 
 
     // Формирование команд
-    this.playerTeam = generateTeam(this.gamePlay.playerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam, 'player');
-    this.computerTeam = generateTeam(this.gamePlay.computerTypes, this.gamePlay.maxLevel, this.gamePlay.charInTeam, 'computer');
+    this.playerTeam = generateTeam(this.gamePlay.playerTypes, 1, this.gamePlay.charInTeam, 'player');
+    this.computerTeam = generateTeam(this.gamePlay.computerTypes, 1, this.gamePlay.charInTeam, 'computer');
 
     // Формирование массивов персонажей расположенных на игровом поле
     this.playerArray = this.playerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam);
@@ -203,8 +203,12 @@ export default class GameController {
         this.positionedCharacters = this.playerArray.concat(this.computerArray)
       }
       if (this.playerArray.length == 0 || this.computerArray.length == 0) {
-        this.levelUpPlay();
         this.activeCharacter.character.levelUp(this.gamePlay.maxLevel);
+        this.levelUpPlay();
+        this.changePlayer(index);
+
+        return null;
+
         // this.levelUpCharacter(this.activeCharacter.character);
       }
       this.changePlayer(index);
@@ -262,32 +266,64 @@ export default class GameController {
     }
   }
 
-  /**
-   * повышение уровня персонажа
-   * @param  character 
-   */
-  // levelUpCharacter(character) {
-  //   if (character.level < this.gamePlay.maxLevel) {
 
-  //     character.level = character.level += 1;
-  //   }
-  //   const attackBefore = character.attack;
-  //   const life = character.health;
-  //   const attackAfter = Math.max(attackBefore, attackBefore * (80 + life) / 100);
-  //   character.attack = attackAfter;
-  //   if (character.health + 80 >= 100) {
-  //     character.health = 100
-  //   } else {
-  //     character.health += 80;
-  //   }
-  // }
-
-  /**
+  /**переход на слудующий уровень
    * 
    */
   levelUpPlay() {
-    this.gameState.level += 1;
-    this.gamePlay.drawUi(this.gameState.getLevel());
+    if (this.gameState.getLevel()) {
+      this.gameState.level += 1;
+      this.gamePlay.drawUi(this.gameState.getLevel());
+
+      console.log(this.playerArray);
+      console.log(this.computerArray);
+
+
+
+      const charInTeam = this.gamePlay.charInTeam + this.gameState.level - 1;
+      const playerCount = this.playerArray.length;
+      const computerCount = this.computerArray.length;
+
+      console.log(charInTeam)
+      console.log(playerCount)
+      console.log(computerCount)
+
+
+      const newPlayerTeam = generateTeam(this.gamePlay.playerTypes, 1, charInTeam - playerCount, 'player');
+      const newComputerTeam = generateTeam(this.gamePlay.computerTypes, 1, charInTeam - computerCount, 'computer');
+
+      console.log(newPlayerTeam)
+      console.log(newComputerTeam)
+
+      console.log(charInTeam - playerCount)
+      console.log(charInTeam - computerCount)
+
+
+
+      const newPlayerArray = newPlayerTeam.getPositionedCharacters(this.gamePlay.boardSize, charInTeam - playerCount);
+      const newComputerArray = newComputerTeam.getPositionedCharacters(this.gamePlay.boardSize, charInTeam - computerCount);
+
+
+      console.log(newPlayerArray)
+      console.log(newComputerArray)
+
+      this.playerArray = this.playerArray.concat(newPlayerArray);
+      this.computerArray = this.computerArray.concat(newComputerArray);
+
+      console.log(this.playerArray)
+      console.log(this.computerArray)
+
+      this.positionedCharacters = this.playerArray.concat(this.computerArray);
+      this.gamePlay.redrawPositions(this.positionedCharacters);
+
+  
+  
+      
+    }
+
+    else {
+      GamePlay.showMessage('Game Over')
+    }
   }
 
 }

@@ -17,7 +17,7 @@ import Vampire from './characters/Vampire';
 export default class GamePlay {
   constructor() {
     this.boardSize = 8;
-    this.charInTeam = 3;
+    this.charInTeam = 2;
     this.maxLevel = 3;
     this.playerTypes = [Bowman, Swordsman, Magician];
     this.computerTypes = [Daemon, Undead, Vampire];

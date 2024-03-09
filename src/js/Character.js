@@ -16,7 +16,7 @@ import { getArea } from "./utils";
  */
 export default class Character {
   constructor(level, type = 'generic') {
-    this.level = level;
+    this.level = 1;
     this.attack = 0;
     this.defence = 0;
     this.health = 50;
@@ -24,6 +24,10 @@ export default class Character {
 
     if (new.target === Character) {
       throw new Error('Невозможно создать персонаж Character');
+    }
+
+    for (let i=2; i <= level; i++) {
+      this.levelUp(level)
     }
   }
 

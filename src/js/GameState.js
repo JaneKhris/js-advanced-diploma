@@ -28,9 +28,11 @@ export default class GameState {
       case 3:
         return themes.arctic;
       case 4:
-        return themes.arctic;
+        return themes.mountain;
       default:
-        break;
+        return false;
     }
   }
+
+  
 }

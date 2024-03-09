@@ -20,10 +20,9 @@ test('test characterGenerator', () => {
 
 test('test count generateTeam ', () => {
   const playerTypes = [Bowman, Swordsman, Magician];
-  const gen = generateTeam(playerTypes, 4, 5);
+  const gen = generateTeam(playerTypes, 4, 5, 'player');
   for (let i = 0; i < 20; i += 1) {
-    const next = gen.next().value;
-    if (!next.characters.length === 5) {
+    if (!gen.characters.length === 5) {
       throw new Error();
     }
   }
@@ -34,10 +33,9 @@ test('test count generateTeam ', () => {
 
 test('test level generateTeam ', () => {
   const playerTypes = [Bowman, Swordsman, Magician];
-  const gen = generateTeam(playerTypes, 4, 5);
+  const gen = generateTeam(playerTypes, 4, 5, 'player');
   for (let i = 0; i < 20; i += 1) {
-    const next = gen.next().value;
-    next.characters.forEach((element) => {
+    gen.characters.forEach((element) => {
       if (element.level > 4) {
         throw new Error();
       }

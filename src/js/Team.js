@@ -23,12 +23,12 @@ export default class Team {
  * @returns массив, содержащий индексы полей, в которыых будут расположены персонажи команды
  * */
 
-  getPositions(boardSize, count) {
+  getPositions(boardSize, count, positionsUsed) {
     const available = this.getAvailable(boardSize);
     const positions = [];
     while (positions.length < count) {
       const item = available[Math.floor(Math.random() * available.length)];
-      if (!positions.includes(item)) {
+      if (!positions.includes(item) && (!positionsUsed.includes(item))) {
         positions.push(item);
       }
     }
@@ -42,8 +42,8 @@ export default class Team {
  * @returns массив, содержащий экземпляры класса PositionedCharacter
  * */
 
-  getPositionedCharacters(boardSize, count) {
-      const positions = this.getPositions(boardSize, count);
+  getPositionedCharacters(boardSize, count, positionsUsed) {
+      const positions = this.getPositions(boardSize, count, positionsUsed);
       const positionedCharacterArray = [];
       for (let i = 0; i < this.characters.length; i += 1) {
         const item = new PositionedCharacter(this.characters[i], positions[i]);

@@ -23,8 +23,8 @@ export default class GameController {
     this.computerTeam = generateTeam(this.gamePlay.computerTypes, 1, this.gamePlay.charInTeam, 'computer');
 
     // Формирование массивов персонажей расположенных на игровом поле
-    this.playerArray = this.playerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam);
-    this.computerArray = this.computerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam);
+    this.playerArray = this.playerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam, []);
+    this.computerArray = this.computerTeam.getPositionedCharacters(this.gamePlay.boardSize, this.gamePlay.charInTeam, []);
     this.positionedCharacters = this.playerArray.concat(this.computerArray)
 
     // Отрисовка поля
@@ -202,14 +202,21 @@ export default class GameController {
         this.computerArray = this.computerArray.filter((item => item.position != index))
         this.positionedCharacters = this.playerArray.concat(this.computerArray)
       }
-      if (this.playerArray.length == 0 || this.computerArray.length == 0) {
+      if (this.playerArray.length == 0 ) {
+        this.computerArray.forEach((item) => {
+          item.character.levelUp(this.gamePlay.maxLevel)
+        })
         this.activeCharacter.character.levelUp(this.gamePlay.maxLevel);
         this.levelUpPlay();
         this.changePlayer(index);
-
-        return null;
-
-        // this.levelUpCharacter(this.activeCharacter.character);
+      }
+      if (this.computerArray.length == 0) {
+        this.playerArray.forEach((item) => {
+          item.character.levelUp(this.gamePlay.maxLevel)
+        })
+        this.activeCharacter.character.levelUp(this.gamePlay.maxLevel);
+        this.levelUpPlay();
+        this.changePlayer(index);
       }
       this.changePlayer(index);
       if (this.gameState.next.computer) {
@@ -271,8 +278,8 @@ export default class GameController {
    * 
    */
   levelUpPlay() {
-    if (this.gameState.getLevel()) {
-      this.gameState.level += 1;
+    if (this.gameState.gameLevel < 4) {
+      this.gameState.gameLevel += 1;
       this.gamePlay.drawUi(this.gameState.getLevel());
 
       console.log(this.playerArray);
@@ -280,7 +287,7 @@ export default class GameController {
 
 
 
-      const charInTeam = this.gamePlay.charInTeam + this.gameState.level - 1;
+      const charInTeam = this.gamePlay.charInTeam + this.gameState.gameLevel - 1;
       const playerCount = this.playerArray.length;
       const computerCount = this.computerArray.length;
 
@@ -300,8 +307,8 @@ export default class GameController {
 
 
 
-      const newPlayerArray = newPlayerTeam.getPositionedCharacters(this.gamePlay.boardSize, charInTeam - playerCount);
-      const newComputerArray = newComputerTeam.getPositionedCharacters(this.gamePlay.boardSize, charInTeam - computerCount);
+      const newPlayerArray = newPlayerTeam.getPositionedCharacters(this.gamePlay.boardSize, charInTeam - playerCount, this.getPositionesUsed());
+      const newComputerArray = newComputerTeam.getPositionedCharacters(this.gamePlay.boardSize, charInTeam - computerCount, this.getPositionesUsed());
 
 
       console.log(newPlayerArray)
@@ -314,16 +321,19 @@ export default class GameController {
       console.log(this.computerArray)
 
       this.positionedCharacters = this.playerArray.concat(this.computerArray);
-      this.gamePlay.redrawPositions(this.positionedCharacters);
-
-  
-  
-      
     }
 
     else {
       GamePlay.showMessage('Game Over')
     }
+  }
+
+  getPositionesUsed() {
+    const positionsUsed = [];
+    this.positionedCharacters.forEach((item) => {
+      positionsUsed.push(item.position)
+    })
+    return positionsUsed
   }
 
 }

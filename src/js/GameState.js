@@ -6,7 +6,7 @@ export default class GameState {
       player: true,
       computer: false
     };
-    this.level = 1;
+    this.gameLevel = 1;
   }
 
   change() {
@@ -20,7 +20,7 @@ export default class GameState {
   }
 
   getLevel() {
-    switch (this.level) {
+    switch (this.gameLevel) {
       case 1:
         return themes.prairie;
       case 2:
